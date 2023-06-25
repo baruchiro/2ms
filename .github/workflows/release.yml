@@ -50,6 +50,31 @@ jobs:
       - name: Go Mod Tidy
         run: go mod tidy
 
+      - name: update README
+        run: |
+          help_message=$(go run .)
+          ehco '```' > output.txt
+          echo "$help_message" >> output.txt
+          echo '```' >> output.txt
+          sed -i '/<!-- command-line:start -->/,/<!-- command-line:end -->/{
+            /<!-- command-line:start -->/{
+              p
+              r output.txt
+            }
+            /<!-- command-line:end -->/!d
+          }' README.md
+      - name: commit and push
+        id: git-check
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add README.md
+          git diff-index --quiet HEAD || git commit -m "update README.md"
+          git fetch
+          git checkout master
+          git merge --no-ff ${{ github.sha }}
+          git push origin master
+
       - name: Go Build
         env:
           VERSION: ${{ needs.test.outputs.version }}
