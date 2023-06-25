@@ -30,7 +30,7 @@ jobs:
       - name: update README
         run: |
           help_message=$(go run .)
-          ehco '```' > output.txt
+          echo '```' > output.txt
           echo "$help_message" >> output.txt
           echo '```' >> output.txt
           sed -i '/<!-- command-line:start -->/,/<!-- command-line:end -->/{
